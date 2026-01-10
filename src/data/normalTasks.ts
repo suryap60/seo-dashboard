@@ -1,0 +1,70 @@
+import type { NormalTask, TaskGroup } from "@/types/task";
+
+export const taskGroups: TaskGroup[] = [
+  { id: "g1", name: "Technical SEO", color: "info" },
+  { id: "g2", name: "Content Strategy", color: "success" },
+  { id: "g3", name: "Analytics & Reporting", color: "warning" },
+];
+
+export const initialNormalTasks: NormalTask[] = [
+  {
+    id: "nt-1",
+    title: "Optimize site speed",
+    description: "Improve page load time by optimizing images and reducing JavaScript bundles",
+    group: "Technical SEO",
+    assignee: "Alex Thompson",
+    dueDate: "2026-01-18",
+    priority: "high",
+    status: "in_progress",
+  },
+  {
+    id: "nt-2",
+    title: "Fix broken internal links",
+    description: "Audit and fix all broken internal links across the website",
+    group: "Technical SEO",
+    assignee: "Sarah Johnson",
+    dueDate: "2026-01-22",
+    priority: "medium",
+    status: "todo",
+  },
+  {
+    id: "nt-3",
+    title: "Create content calendar",
+    description: "Plan and schedule content for the next quarter",
+    group: "Content Strategy",
+    assignee: "Mike Chen",
+    dueDate: "2026-01-15",
+    priority: "high",
+    status: "in_progress",
+  },
+  {
+    id: "nt-4",
+    title: "Monthly SEO performance report",
+    description: "Compile and analyze December SEO metrics",
+    group: "Analytics & Reporting",
+    assignee: "Emily Brown",
+    dueDate: "2026-01-10",
+    priority: "medium",
+    status: "completed",
+  },
+  {
+    id: "nt-5",
+    title: "Update meta descriptions",
+    description: "Review and update meta descriptions for top 50 pages",
+    group: "Technical SEO",
+    assignee: "John Doe",
+    dueDate: "2026-01-25",
+    priority: "low",
+    status: "todo",
+  },
+  {
+    id: "nt-6",
+    title: "Competitor content analysis",
+    description: "Analyze competitor content strategies and identify gaps",
+    group: "Content Strategy",
+    assignee: "Sarah Johnson",
+    dueDate: "2026-01-20",
+    priority: "medium",
+    status: "in_progress",
+  },
+];
