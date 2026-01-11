@@ -24,15 +24,17 @@ export function TrafficChart({ data }: TrafficChartProps) {
             </defs>
             <XAxis
               dataKey="month"
-              axisLine={false}
+              axisLine={true}
               tickLine={false}
               tick={{ fill: "hsl(0, 0%, 60%)", fontSize: 12 }}
+              stroke="hsl(0, 0%, 30%)"
             />
             <YAxis
-              axisLine={false}
+              axisLine={true}
               tickLine={false}
               tick={{ fill: "hsl(0, 0%, 60%)", fontSize: 12 }}
               width={45}
+              stroke="hsl(0, 0%, 30%)"
             />
             <Tooltip
               contentStyle={{

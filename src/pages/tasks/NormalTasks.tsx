@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Search, FolderOpen } from "lucide-react";
+import { toast } from "sonner";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { TaskTable } from "./TaskTable";
 import { TaskModal } from "./TaskModal";
@@ -18,10 +19,12 @@ import type { NormalTask } from "@/types/task";
 export default function NormalTasks() {
   const [tasks, setTasks] = useState<NormalTask[]>(initialNormalTasks);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<NormalTask | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [groupFilter, setGroupFilter] = useState<string>("all");
+  const [assigneeFilter, setAssigneeFilter] = useState<string>("");
 
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
@@ -30,7 +33,8 @@ export default function NormalTasks() {
     const matchesStatus = statusFilter === "all" || task.status === statusFilter;
     const matchesPriority = priorityFilter === "all" || task.priority === priorityFilter;
     const matchesGroup = groupFilter === "all" || task.group === groupFilter;
-    return matchesSearch && matchesStatus && matchesPriority && matchesGroup;
+    const matchesAssignee = assigneeFilter === "" || task.assignee.toLowerCase().includes(assigneeFilter.toLowerCase());
+    return matchesSearch && matchesStatus && matchesPriority && matchesGroup && matchesAssignee;
   });
 
   const handleAddTask = (newTask: Omit<NormalTask, "id">) => {
@@ -40,6 +44,38 @@ export default function NormalTasks() {
     };
     setTasks([task, ...tasks]);
     setIsModalOpen(false);
+    toast.success("Task created successfully!");
+  };
+
+  const handleEditTask = (task: NormalTask) => {
+    setEditingTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateTask = (id: string, updatedTask: Omit<NormalTask, "id">) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...updatedTask, id } : task
+    ));
+    setIsModalOpen(false);
+    setEditingTask(null);
+    toast.success("Task updated successfully!");
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+    toast.success("Task deleted successfully!");
+  };
+
+  const handleUpdateField = (taskId: string, field: keyof NormalTask, value: string) => {
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, [field]: value } : task
+    ));
+    toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully!`);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingTask(null);
   };
 
   return (
@@ -92,7 +128,12 @@ export default function NormalTasks() {
             <SelectItem value="high">High</SelectItem>
           </SelectContent>
         </Select>
-        <Input placeholder="Assignee" className="w-[140px]" />
+        <Input 
+          placeholder="Assignee" 
+          className="w-[140px]" 
+          value={assigneeFilter}
+          onChange={(e) => setAssigneeFilter(e.target.value)}
+        />
       </div>
 
       {/* Group Filter */}
@@ -113,14 +154,21 @@ export default function NormalTasks() {
       </div>
 
       {/* Table */}
-      <TaskTable tasks={filteredTasks} />
+      <TaskTable 
+        tasks={filteredTasks} 
+        onEditTask={handleEditTask}
+        onDeleteTask={handleDeleteTask}
+        onUpdateField={handleUpdateField}
+      />
 
       {/* Modal */}
       <TaskModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
         onSubmit={handleAddTask}
+        onUpdate={handleUpdateTask}
         groups={taskGroups}
+        editTask={editingTask}
       />
     </PageWrapper>
   );

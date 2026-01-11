@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Search } from "lucide-react";
+import { toast } from "sonner";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { ContentTable } from "./ContentTable";
 import { ContentViewer } from "./ContentViewer";
@@ -16,17 +17,42 @@ import { initialContentTasks } from "@/data/contentTasks";
 import type { ContentTask } from "@/types/task";
 
 export default function ContentTasks() {
-  const [tasks, ] = useState<ContentTask[]>(initialContentTasks);
+  const [tasks, setTasks] = useState<ContentTask[]>(initialContentTasks);
   const [selectedTask, setSelectedTask] = useState<ContentTask | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [assigneeFilter, setAssigneeFilter] = useState<string>("");
+
+  const handleEditTask = (task: ContentTask) => {
+    // For now, just show a toast - you can implement edit modal later
+    toast.info("Edit functionality coming soon!");
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+    toast.success("Content task deleted successfully!");
+  };
+
+  const handleUpdateField = (taskId: string, field: keyof ContentTask, value: string) => {
+    setTasks(tasks.map(task => {
+      if (task.id === taskId) {
+        if (field === "wordCount") {
+          return { ...task, [field]: parseInt(value) || 0 };
+        }
+        return { ...task, [field]: value };
+      }
+      return task;
+    }));
+    toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully!`);
+  };
 
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || task.status === statusFilter;
     const matchesPriority = priorityFilter === "all" || task.priority === priorityFilter;
-    return matchesSearch && matchesStatus && matchesPriority;
+    const matchesAssignee = assigneeFilter === "" || task.assignee.toLowerCase().includes(assigneeFilter.toLowerCase());
+    return matchesSearch && matchesStatus && matchesPriority && matchesAssignee;
   });
 
   return (
@@ -73,11 +99,22 @@ export default function ContentTasks() {
             <SelectItem value="high">High</SelectItem>
           </SelectContent>
         </Select>
-        <Input placeholder="Assignee" className="w-[140px]" />
+        <Input 
+          placeholder="Assignee" 
+          className="w-[140px]" 
+          value={assigneeFilter}
+          onChange={(e) => setAssigneeFilter(e.target.value)}
+        />
       </div>
 
       {/* Table */}
-      <ContentTable tasks={filteredTasks} onViewTask={setSelectedTask} />
+      <ContentTable 
+        tasks={filteredTasks} 
+        onViewTask={setSelectedTask}
+        onEditTask={handleEditTask}
+        onDeleteTask={handleDeleteTask}
+        onUpdateField={handleUpdateField}
+      />
 
       {/* Content Viewer Sheet */}
       <ContentViewer

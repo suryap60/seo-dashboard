@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,10 +23,12 @@ interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (task: Omit<NormalTask, "id">) => void;
+  onUpdate?: (id: string, task: Omit<NormalTask, "id">) => void;
   groups: TaskGroup[];
+  editTask?: NormalTask | null;
 }
 
-export function TaskModal({ isOpen, onClose, onSubmit, groups }: TaskModalProps) {
+export function TaskModal({ isOpen, onClose, onSubmit, onUpdate, groups, editTask }: TaskModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [group, setGroup] = useState(groups[0]?.name || "");
@@ -35,11 +37,33 @@ export function TaskModal({ isOpen, onClose, onSubmit, groups }: TaskModalProps)
   const [priority, setPriority] = useState<Priority>("medium");
   const [status, setStatus] = useState<TaskStatus>("todo");
 
+  // Populate form when editing
+  useEffect(() => {
+    if (editTask) {
+      setTitle(editTask.title);
+      setDescription(editTask.description);
+      setGroup(editTask.group);
+      setAssignee(editTask.assignee);
+      setDueDate(editTask.dueDate);
+      setPriority(editTask.priority);
+      setStatus(editTask.status);
+    } else {
+      // Reset form for new task
+      setTitle("");
+      setDescription("");
+      setGroup(groups[0]?.name || "");
+      setAssignee("");
+      setDueDate("");
+      setPriority("medium");
+      setStatus("todo");
+    }
+  }, [editTask, groups]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !assignee.trim() || !dueDate || !group) return;
 
-    onSubmit({
+    const taskData = {
       title,
       description,
       group,
@@ -47,7 +71,13 @@ export function TaskModal({ isOpen, onClose, onSubmit, groups }: TaskModalProps)
       dueDate,
       priority,
       status,
-    });
+    };
+
+    if (editTask && onUpdate) {
+      onUpdate(editTask.id, taskData);
+    } else {
+      onSubmit(taskData);
+    }
 
     // Reset form
     setTitle("");
@@ -63,7 +93,9 @@ export function TaskModal({ isOpen, onClose, onSubmit, groups }: TaskModalProps)
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">New Task</DialogTitle>
+          <DialogTitle className="text-xl font-semibold">
+            {editTask ? "Edit Task" : "New Task"}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
@@ -162,7 +194,9 @@ export function TaskModal({ isOpen, onClose, onSubmit, groups }: TaskModalProps)
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Create Task</Button>
+            <Button type="submit">
+              {editTask ? "Update Task" : "Create Task"}
+            </Button>
           </div>
         </form>
       </DialogContent>

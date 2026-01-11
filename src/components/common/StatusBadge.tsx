@@ -11,27 +11,27 @@ interface StatusBadgeProps {
 const statusConfig: Record<Status, { label: string; className: string }> = {
   todo: {
     label: "todo",
-    className: "border-status-todo text-status-todo",
+    className: "bg-gray-100 text-gray-700 border border-gray-200",
   },
   in_progress: {
     label: "in progress",
-    className: "border-status-in-progress text-status-in-progress",
+    className: "bg-red-100 text-red-700 border border-red-200",
   },
   completed: {
     label: "completed",
-    className: "border-status-completed text-status-completed",
+    className: "bg-green-100 text-green-700 border border-green-200",
   },
   draft: {
     label: "draft",
-    className: "border-status-draft text-status-draft",
+    className: "bg-gray-100 text-gray-700 border border-gray-200",
   },
   in_review: {
     label: "in review",
-    className: "border-status-in-review text-status-in-review",
+    className: "bg-yellow-100 text-yellow-700 border border-yellow-200",
   },
   published: {
     label: "published",
-    className: "border-status-published text-status-published",
+    className: "bg-green-100 text-green-700 border border-green-200",
   },
 };
 
@@ -41,7 +41,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded border px-2 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-md px-3 py-1 text-xs font-medium",
         config.className,
         className
       )}

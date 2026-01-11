@@ -9,16 +9,16 @@ interface DifficultyBadgeProps {
 
 const difficultyConfig: Record<Difficulty, { label: string; className: string }> = {
   low: {
-    label: "low",
-    className: "border-priority-low text-priority-low",
+    label: "Easy",
+    className: "bg-green-100 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800",
   },
   medium: {
-    label: "medium",
-    className: "border-priority-medium text-priority-medium",
+    label: "Medium",
+    className: "bg-yellow-100 text-yellow-700 border border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800",
   },
   high: {
-    label: "high",
-    className: "border-priority-high text-priority-high",
+    label: "Hard",
+    className: "bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800",
   },
 };
 
@@ -28,7 +28,7 @@ export function DifficultyBadge({ difficulty, className }: DifficultyBadgeProps)
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded border px-2 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-md px-3 py-1 text-xs font-medium",
         config.className,
         className
       )}

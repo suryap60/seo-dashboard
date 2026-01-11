@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Search } from "lucide-react";
+import { toast } from "sonner";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { BacklinkTable } from "./BacklinkTable";
 import { BacklinkModal } from "./BacklinkModal";
@@ -18,9 +19,11 @@ import type { BacklinkTask } from "@/common/task";
 export default function BacklinkManager() {
   const [tasks, setTasks] = useState<BacklinkTask[]>(initialBacklinkTasks);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<BacklinkTask | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [assigneeFilter, setAssigneeFilter] = useState<string>("");
 
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch =
@@ -28,7 +31,8 @@ export default function BacklinkManager() {
       task.url.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || task.status === statusFilter;
     const matchesPriority = priorityFilter === "all" || task.priority === priorityFilter;
-    return matchesSearch && matchesStatus && matchesPriority;
+    const matchesAssignee = assigneeFilter === "" || task.assignee.toLowerCase().includes(assigneeFilter.toLowerCase());
+    return matchesSearch && matchesStatus && matchesPriority && matchesAssignee;
   });
 
   const handleAddTask = (newTask: Omit<BacklinkTask, "id">) => {
@@ -38,6 +42,38 @@ export default function BacklinkManager() {
     };
     setTasks([task, ...tasks]);
     setIsModalOpen(false);
+    toast.success("Backlink task created successfully!");
+  };
+
+  const handleEditTask = (task: BacklinkTask) => {
+    setEditingTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateTask = (id: string, updatedTask: Omit<BacklinkTask, "id">) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...updatedTask, id } : task
+    ));
+    setIsModalOpen(false);
+    setEditingTask(null);
+    toast.success("Backlink task updated successfully!");
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+    toast.success("Backlink task deleted successfully!");
+  };
+
+  const handleUpdateField = (taskId: string, field: keyof BacklinkTask, value: string) => {
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, [field]: value } : task
+    ));
+    toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully!`);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingTask(null);
   };
 
   return (
@@ -84,16 +120,26 @@ export default function BacklinkManager() {
             <SelectItem value="high">High</SelectItem>
           </SelectContent>
         </Select>
-        <Input placeholder="Assignee" className="w-[140px]" />
+        <Input 
+          placeholder="Assignee" 
+          className="w-[140px]" 
+          value={assigneeFilter}
+          onChange={(e) => setAssigneeFilter(e.target.value)}
+        />
       </div>
 
       {/* Table */}
-      <BacklinkTable tasks={filteredTasks} />
+      <BacklinkTable 
+        tasks={filteredTasks} 
+        onEditTask={handleEditTask}
+        onDeleteTask={handleDeleteTask}
+        onUpdateField={handleUpdateField}
+      />
 
       {/* Modal */}
       <BacklinkModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
         onSubmit={handleAddTask}
       />
     </PageWrapper>

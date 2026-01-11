@@ -14,15 +14,17 @@ export function BacklinkChart({ data }: BacklinkChartProps) {
           <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <XAxis
               dataKey="day"
-              axisLine={false}
+              axisLine={true}
               tickLine={false}
               tick={{ fill: "hsl(0, 0%, 60%)", fontSize: 12 }}
+              stroke="hsl(0, 0%, 30%)"
             />
             <YAxis
-              axisLine={false}
+              axisLine={true}
               tickLine={false}
               tick={{ fill: "hsl(0, 0%, 60%)", fontSize: 12 }}
               width={30}
+              stroke="hsl(0, 0%, 30%)"
             />
             <Tooltip
               contentStyle={{
