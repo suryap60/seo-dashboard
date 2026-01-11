@@ -45,12 +45,6 @@ export function TaskTable({ tasks, onEditTask, onDeleteTask, onUpdateField }: Ta
     { value: "completed", label: "Completed" },
   ];
 
-  const groupOptions = [
-    { value: "Technical SEO", label: "Technical SEO" },
-    { value: "Content Strategy", label: "Content Strategy" },
-    { value: "Analytics & Reporting", label: "Analytics & Reporting" },
-  ];
-
   return (
     <div className="bg-card rounded-lg border border-border">
       <Table>

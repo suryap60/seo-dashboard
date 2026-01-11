@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { ContentTable } from "./ContentTable";
 import { ContentViewer } from "./ContentViewer";
+import { ContentModal } from "./ContentModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,14 +20,35 @@ import type { ContentTask } from "@/types/task";
 export default function ContentTasks() {
   const [tasks, setTasks] = useState<ContentTask[]>(initialContentTasks);
   const [selectedTask, setSelectedTask] = useState<ContentTask | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<ContentTask | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [assigneeFilter, setAssigneeFilter] = useState<string>("");
 
+  const handleAddTask = (newTask: Omit<ContentTask, "id">) => {
+    const task: ContentTask = {
+      ...newTask,
+      id: `ct-${Date.now()}`,
+    };
+    setTasks([task, ...tasks]);
+    setIsModalOpen(false);
+    toast.success("Content task created successfully!");
+  };
+
   const handleEditTask = (task: ContentTask) => {
-    // For now, just show a toast - you can implement edit modal later
-    toast.info("Edit functionality coming soon!");
+    setEditingTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateTask = (id: string, updatedTask: Omit<ContentTask, "id">) => {
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...updatedTask, id } : task
+    ));
+    setIsModalOpen(false);
+    setEditingTask(null);
+    toast.success("Content task updated successfully!");
   };
 
   const handleDeleteTask = (taskId: string) => {
@@ -47,6 +69,11 @@ export default function ContentTasks() {
     toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully!`);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingTask(null);
+  };
+
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || task.status === statusFilter;
@@ -60,7 +87,7 @@ export default function ContentTasks() {
       title="Content Tasks"
       description="Create and manage your content creation tasks"
       actions={
-        <Button>
+        <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           New Content Task
         </Button>
@@ -121,6 +148,15 @@ export default function ContentTasks() {
         task={selectedTask}
         isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}
+      />
+
+      {/* Content Modal */}
+      <ContentModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleAddTask}
+        onUpdate={handleUpdateTask}
+        editTask={editingTask}
       />
     </PageWrapper>
   );

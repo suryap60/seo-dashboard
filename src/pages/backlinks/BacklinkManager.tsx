@@ -141,6 +141,8 @@ export default function BacklinkManager() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleAddTask}
+        onUpdate={handleUpdateTask}
+        editTask={editingTask}
       />
     </PageWrapper>
   );

@@ -16,24 +16,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { BacklinkTask } from "@/types/task";
-import type { Priority, TaskStatus } from "@/types/common";
+import type { ContentTask } from "@/types/task";
+import type { Priority } from "@/types/common";
 
-interface BacklinkModalProps {
+interface ContentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (task: Omit<BacklinkTask, "id">) => void;
-  onUpdate?: (id: string, task: Omit<BacklinkTask, "id">) => void;
-  editTask?: BacklinkTask | null;
+  onSubmit: (task: Omit<ContentTask, "id">) => void;
+  onUpdate?: (id: string, task: Omit<ContentTask, "id">) => void;
+  editTask?: ContentTask | null;
 }
 
-export function BacklinkModal({ isOpen, onClose, onSubmit, onUpdate, editTask }: BacklinkModalProps) {
+export function ContentModal({ isOpen, onClose, onSubmit, onUpdate, editTask }: ContentModalProps) {
   const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("https://example.com");
   const [assignee, setAssignee] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [wordCount, setWordCount] = useState(1000);
   const [priority, setPriority] = useState<Priority>("medium");
-  const [status, setStatus] = useState<TaskStatus>("todo");
+  const [status, setStatus] = useState<"draft" | "in_review" | "published">("draft");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<{ id: string; name: string }[]>([]);
   const [subtaskInput, setSubtaskInput] = useState("");
@@ -43,9 +43,9 @@ export function BacklinkModal({ isOpen, onClose, onSubmit, onUpdate, editTask }:
   useEffect(() => {
     if (editTask) {
       setTitle(editTask.title);
-      setUrl(editTask.url);
       setAssignee(editTask.assignee);
       setDueDate(editTask.dueDate);
+      setWordCount(editTask.wordCount);
       setPriority(editTask.priority);
       setStatus(editTask.status);
       setTags(editTask.tags);
@@ -53,11 +53,11 @@ export function BacklinkModal({ isOpen, onClose, onSubmit, onUpdate, editTask }:
     } else {
       // Reset form for new task
       setTitle("");
-      setUrl("https://example.com");
       setAssignee("");
       setDueDate("");
+      setWordCount(1000);
       setPriority("medium");
-      setStatus("todo");
+      setStatus("draft");
       setTags([]);
       setSubtasks([]);
     }
@@ -83,9 +83,9 @@ export function BacklinkModal({ isOpen, onClose, onSubmit, onUpdate, editTask }:
 
     const taskData = {
       title,
-      url,
       assignee,
       dueDate,
+      wordCount,
       priority,
       status,
       tags,
@@ -100,11 +100,11 @@ export function BacklinkModal({ isOpen, onClose, onSubmit, onUpdate, editTask }:
 
     // Reset form
     setTitle("");
-    setUrl("https://example.com");
     setAssignee("");
     setDueDate("");
+    setWordCount(1000);
     setPriority("medium");
-    setStatus("todo");
+    setStatus("draft");
     setTags([]);
     setSubtasks([]);
   };
@@ -114,30 +114,20 @@ export function BacklinkModal({ isOpen, onClose, onSubmit, onUpdate, editTask }:
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            {editTask ? "Edit Backlink Task" : "New Backlink Task"}
+            {editTask ? "Edit Content Task" : "New Content Task"}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Task Title *</Label>
+            <Label htmlFor="title">Content Title *</Label>
             <Input
               id="title"
-              placeholder="e.g., Reach out to tech blogs"
+              placeholder="e.g., Write blog post about SEO"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="border-primary focus:ring-primary"
               required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="url">Target URL</Label>
-            <Input
-              id="url"
-              placeholder="https://example.com"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
             />
           </div>
 
@@ -164,6 +154,18 @@ export function BacklinkModal({ isOpen, onClose, onSubmit, onUpdate, editTask }:
             </div>
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="wordCount">Word Count</Label>
+            <Input
+              id="wordCount"
+              type="number"
+              placeholder="1000"
+              value={wordCount}
+              onChange={(e) => setWordCount(parseInt(e.target.value) || 0)}
+              min="0"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Priority</Label>
@@ -180,14 +182,14 @@ export function BacklinkModal({ isOpen, onClose, onSubmit, onUpdate, editTask }:
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as TaskStatus)}>
+              <Select value={status} onValueChange={(v) => setStatus(v as "draft" | "in_review" | "published")}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todo">To Do</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="in_review">In Review</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
                 </SelectContent>
               </Select>
             </div>
