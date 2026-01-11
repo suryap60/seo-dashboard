@@ -87,7 +87,7 @@ export function BacklinkTable({ tasks, onEditTask, onDeleteTask, onUpdateField }
                     placeholder="URL"
                     className="w-full"
                   >
-                    <a href={task.url} className="text-link hover:underline truncate block w-full" target="_blank" rel="noopener noreferrer">
+                    <a href={task.url} className="text-[#dc2626] hover:underline truncate block w-full" target="_blank" rel="noopener noreferrer">
                       {task.url}
                     </a>
                   </EditableCell>
